@@ -1,20 +1,16 @@
 <template>
   <v-app>
-    <v-toolbar color="indigo" dark fixed app>
+    <v-app-bar app color="indigo" dark fixed>
 <v-toolbar-title> Fabrica de Memes </v-toolbar-title>
-    </v-toolbar>
+    </v-app-bar>
 
-    <v-content> 
+    <v-main> 
 
       <v-container fluid> 
         <v-layout>
           <router-view></router-view>
         </v-layout>
       </v-container>
-    </v-content>
-
-    <v-main>
-      <router-view/>
     </v-main>
   </v-app>
 </template>
