@@ -6,7 +6,7 @@ Vue.use(Router);
 
 const router = new Router({
     mode: 'history',
-    router: [
+    routes: [
         {
             path: '/',
             name: 'Home',
