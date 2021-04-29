@@ -25,3 +25,8 @@ export default {
   }),
 };
 </script>
+<style>
+#primerBoton {
+  margin-bottom: 70px;
+}
+</style>
