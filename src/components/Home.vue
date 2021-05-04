@@ -22,7 +22,7 @@
         <v-container fluid>
           <v-row>
             <v-flex v-for="image in images" v-bind:key="image.id">
-              <v-card>
+              <v-card style="width:50%; margin: 20px auto; display:block">
                 <v-img 
                 class="white--text"
                 height="200px"
@@ -30,10 +30,13 @@
                   
                 </v-img>
 
-                <v-card-title>
+                <v-card-title style="height: 150px">
                   <div>
                     <span class="grey--text"> {{image.name}}</span>
                     <br>
+                    <span>
+                      {{image.labels | separateLabels}}
+                    </span>
                     <v-chip> {{image.scorePromedio}}</v-chip>
                     <br>
                   </div>
@@ -52,10 +55,12 @@
 
 <script>
 import { firestore, storage } from '../main.js';
+import axios from 'axios';
   export default {
     name: 'Home',
 
     data: () => ({
+      apiKey: 'AIzaSyA7CcazU1sL8GUDWQ5PBqAamouX2YlE2iQ',
       file:'',
       images: [],
     }),
@@ -70,13 +75,39 @@ import { firestore, storage } from '../main.js';
       storage.child(name).put(this.file, metadata)
       .then(snapshot => snapshot.ref.getDownloadURL())
       .then( url => {
-        let image = {
-          url: url,
-          name: name,
-          createdAt: (+new Date()),
-          scorePromedio: 0
+        const input = this.$refs.fileInput
+        input.type = 'text'
+        input.type = 'file'
+        const data = {
+          "requests" : [{
+            "features": [{
+              "type": "LABEL_DETECTION"
+            }],
+            "image": {
+              "source" : {
+                "imageUri": url
+              }
+            }
+          }]
         }
-        firestore.collection('images').add(image)
+
+        axios.post(`https://vision.googleapis.com/v1/images:annotate?key=${this.apiKey}`, data)
+          .then(response => {
+            const labels = []
+            let slicedLabelArray = response.data.responses[0].labelAnnotations.slice(0,5)
+            slicedLabelArray.forEach(function(label){
+              labels.push(label.description)
+            })
+            let image = {
+            url: url,
+            name: name,
+            labels: labels,
+            createdAt: (+new Date()),
+            scorePromedio: 0
+          }
+          firestore.collection('images').add(image)
+          })
+
       })
     },
     goToImageDetail: function(id) {
@@ -87,7 +118,12 @@ import { firestore, storage } from '../main.js';
     return {
       images: firestore.collection('images')
     }
-  }
+  },
+    filters: {
+      separateLabels: function (value) {
+        return `${value[0]}, ${value[1]}, ${value[2]}`
+      }
+    }
   };
   
   
