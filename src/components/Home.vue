@@ -60,7 +60,7 @@ import axios from 'axios';
     name: 'Home',
 
     data: () => ({
-      apiKey: 'AIzaSyA7CcazU1sL8GUDWQ5PBqAamouX2YlE2iQ',
+      apiKey: '',
       file:'',
       images: [],
     }),
